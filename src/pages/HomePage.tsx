@@ -9,6 +9,8 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Navbar } from '@/components/Navbar';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowRight, CheckCircle2, Target, Zap } from 'lucide-react';
+import { screenResume } from '@/lib/supabase';
+import type { ScreeningResult } from '@/types/screening';
 
 const HomePage = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -30,34 +32,17 @@ const HomePage = () => {
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      const formData = new FormData();
-      formData.append('resume', selectedFile);
-      formData.append('jobDescription', jobDescription);
-
-      // Mock API response after delay
-      setTimeout(() => {
-        const mockResults = {
-          score: Math.floor(Math.random() * 30) + 70, // 70-100%
-          matchedSkills: [
-            'JavaScript', 'React', 'Node.js', 'TypeScript', 'Git',
-            'Agile Development', 'Problem Solving', 'Team Collaboration'
-          ],
-          missingSkills: [
-            'Docker', 'AWS', 'GraphQL', 'Testing Frameworks'
-          ],
-          strengths: [
-            'Strong technical background',
-            'Relevant work experience',
-            'Good communication skills'
-          ],
-          fileName: selectedFile.name
-        };
-
-        // Store results in sessionStorage for the results page
-        sessionStorage.setItem('screeningResults', JSON.stringify(mockResults));
-        navigate('/results');
-      }, 2000);
+      // Call Supabase Edge Function
+      const result: ScreeningResult = await screenResume(selectedFile, jobDescription);
+      
+      // Store results in sessionStorage for the results page
+      const resultsWithFileName = {
+        ...result,
+        fileName: selectedFile.name
+      };
+      
+      sessionStorage.setItem('screeningResults', JSON.stringify(resultsWithFileName));
+      navigate('/results');
 
     } catch (error) {
       console.error('Screening failed:', error);

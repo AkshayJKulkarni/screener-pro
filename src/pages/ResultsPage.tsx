@@ -6,17 +6,14 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Navbar } from '@/components/Navbar';
 import { ArrowLeft, Download, RefreshCw, TrendingUp, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import type { ScreeningResult } from '@/types/screening';
 
-interface ScreeningResults {
-  score: number;
-  matchedSkills: string[];
-  missingSkills: string[];
-  strengths: string[];
+interface ScreeningResultsWithFileName extends ScreeningResult {
   fileName: string;
 }
 
 const ResultsPage = () => {
-  const [results, setResults] = useState<ScreeningResults | null>(null);
+  const [results, setResults] = useState<ScreeningResultsWithFileName | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -90,24 +87,24 @@ const ResultsPage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center space-y-6">
-                <div className="space-y-4">
-                  <div className="text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                    {results.score}%
-                  </div>
-                  <div className="space-y-2">
-                    <Progress 
-                      value={results.score} 
-                      className="h-3 w-full max-w-md mx-auto"
-                    />
-                    <p className={`text-lg font-medium ${
-                      getScoreColor(results.score) === 'success' ? 'text-success' :
-                      getScoreColor(results.score) === 'warning' ? 'text-warning' :
-                      'text-destructive'
-                    }`}>
-                      {getScoreDescription(results.score)}
-                    </p>
-                  </div>
-                </div>
+                 <div className="space-y-4">
+                   <div className="text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                     {results.matchScore}%
+                   </div>
+                   <div className="space-y-2">
+                     <Progress 
+                       value={results.matchScore} 
+                       className="h-3 w-full max-w-md mx-auto"
+                     />
+                     <p className={`text-lg font-medium ${
+                       getScoreColor(results.matchScore) === 'success' ? 'text-success' :
+                       getScoreColor(results.matchScore) === 'warning' ? 'text-warning' :
+                       'text-destructive'
+                     }`}>
+                       {getScoreDescription(results.matchScore)}
+                     </p>
+                   </div>
+                 </div>
               </CardContent>
             </Card>
 
@@ -167,28 +164,28 @@ const ResultsPage = () => {
 
             </div>
 
-            {/* Strengths */}
-            <Card className="bg-gradient-card shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-primary" />
-                  Key Strengths
-                </CardTitle>
-                <CardDescription>
-                  What makes your resume stand out for this position
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {results.strengths.map((strength, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-success mt-0.5 flex-shrink-0" />
-                      <span className="text-foreground">{strength}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+             {/* Improvement Suggestions */}
+             <Card className="bg-gradient-card shadow-card">
+               <CardHeader>
+                 <CardTitle className="flex items-center gap-2">
+                   <TrendingUp className="h-5 w-5 text-primary" />
+                   Improvement Suggestions
+                 </CardTitle>
+                 <CardDescription>
+                   Actionable recommendations to enhance your resume
+                 </CardDescription>
+               </CardHeader>
+               <CardContent>
+                 <ul className="space-y-3">
+                   {results.improvementSuggestions.map((suggestion, index) => (
+                     <li key={index} className="flex items-start gap-3">
+                       <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                       <span className="text-foreground">{suggestion}</span>
+                     </li>
+                   ))}
+                 </ul>
+               </CardContent>
+             </Card>
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
